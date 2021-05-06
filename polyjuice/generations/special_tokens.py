@@ -1,0 +1,5 @@
+PERETURB_TOK = "<|perturb|>"
+BLANK_TOK = "[BLANK]"
+SEP_TOK = "[SEP]"
+EMPTY_TOK = "[EMPTY]"
+ANSWER_TOK = "[ANSWER]"

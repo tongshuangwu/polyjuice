@@ -158,6 +158,7 @@ def is_child_phrase(subset, superset):
 
 def _normalize_span(span):
     #print(span,type(span))
+    
     if type(span) == Span: return _normalize_chunk(span.doc, span.start, span.end)
     if type(span) == Token: return _normalize_chunk(span.doc, span.i, span.i+1)
     return None

@@ -1,7 +1,21 @@
+import numpy as np
+from ..helpers import unify_tags, flatten_fillins
+from .special_tokens import BLANK_TOK
 
-####################################################################################
-                ##### HELPER FUNCTIONS FOR SELECTING BLANKS ########
-####################################################################################
+def create_blanked_sents(doc, indexes=None):
+    if indexes:
+        if type(indexes[0]) == int: 
+            indexes = [indexes]
+        indexes_list = [indexes]
+    else:
+        indexes_list = get_random_idxes(
+            doc, is_token_only=False, max_counts=3)
+        
+    blanks = set([flatten_fillins(
+        doc, indexes, [BLANK_TOK] * len(indexes)) \
+        for indexes in indexes_list])
+    return blanks
+
 # the function for placing BLANKS.
 def get_one_random_idx_set(
     doc, max_blank_block=3, req_dep=None, blank_type_prob=None, 
@@ -60,7 +74,7 @@ def get_random_idxes(doc,
         rounds = 1 if dep is not None else 2
         if is_token_only:
             rounds = 5
-        for r in range(rounds):
+        for _ in range(rounds):
             curr_idx = get_one_random_idx_set(
                 doc, req_dep=dep, 
                 pre_selected_idxes=pre_selected_idxes, 
