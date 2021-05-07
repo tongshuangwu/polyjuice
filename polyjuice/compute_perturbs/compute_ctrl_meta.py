@@ -318,7 +318,10 @@ class PhraseMetadata(object):
         else:
             core = self.acore
         core = _normalize_span(core)
-        self.dep, self.pos = core.root.dep_, core.root.pos_
+        try:
+            self.dep, self.pos = core.root.dep_, core.root.pos_
+        except:
+            self.dep, self.pos = "", ""
 
     def short_str(self):
         return f"[{self.op}] {self.acore} -> {self.bcore}"
@@ -422,9 +425,9 @@ class PhraseMetadata(object):
             hypers1, hypers2 = get_hypernyms(aroot), get_hypernyms(broot)
             #print(aroot, hypers1)
             #print(broot, hypers2)
-            if is_wordnet_change(aroot, broot) and (acore.lemma_.lower() in hypers2 or acore.lower_ in hypers2):
+            if is_wordnet_change(aroot, broot) and (acore.lemma_.lower() in hypers2 or acore.text.lower() in hypers2):
                 tag = "lexical"
-            elif is_wordnet_change(aroot, broot) and (bcore.lemma_.lower() in hypers1 or bcore.lower_ in hypers1):
+            elif is_wordnet_change(aroot, broot) and (bcore.lemma_.lower() in hypers1 or bcore.text.lower() in hypers1):
                 tag = "lexical"
             else:
                 syms = get_wordnet_info(all_possible_synonyms, acore)

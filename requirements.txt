@@ -1,5 +1,4 @@
 munch>=2.5.0
-lm-scorer>=0.4.2
 spacy>=3.0.6
 scipy>=1.6.3
 sentence-transformers>=1.1.0

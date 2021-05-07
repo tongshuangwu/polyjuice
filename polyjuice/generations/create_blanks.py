@@ -9,7 +9,7 @@ def create_blanked_sents(doc, indexes=None):
         indexes_list = [indexes]
     else:
         indexes_list = get_random_idxes(
-            doc, is_token_only=False, max_counts=3)
+            doc, is_token_only=False, max_count=3)
         
     blanks = set([flatten_fillins(
         doc, indexes, [BLANK_TOK] * len(indexes)) \
@@ -63,11 +63,12 @@ def get_one_random_idx_set(
 
 def get_random_idxes(doc, 
     pre_selected_idxes=None, 
-    deps=None, is_token_only=False, max_counts=None):
+    deps=None, is_token_only=False, 
+    max_blank_block=3, max_count=None):
     unique_blanks = {str([[0, len(doc)]]): [[0, len(doc)]]}
     default_deps = [None, "", ["subj","obj"], ["aux", "ROOT"], ["conj", "modifier", "clause"]]
-    if is_token_only:
-        unique_blanks = set()
+    if is_token_only: 
+        unique_blanks = {}
     if deps is None: deps = default_deps
     for dep in deps:
         # for each different dep, get some blank
@@ -77,12 +78,18 @@ def get_random_idxes(doc,
         for _ in range(rounds):
             curr_idx = get_one_random_idx_set(
                 doc, req_dep=dep, 
+                max_blank_block=max_blank_block,
                 pre_selected_idxes=pre_selected_idxes, 
-                is_token_only=is_token_only) if dep != "" else ""
+                is_token_only=is_token_only) if dep != "" else None
             if curr_idx is not None:
                 unique_blanks[str(curr_idx)] = curr_idx
     unique_blanks = list(unique_blanks.values())
-    if max_counts is not None:
-        unique_blanks = list(np.random.choice(unique_blanks, min(len(unique_blanks), max_counts), replace=False))
+    if max_count is not None:
+        try:
+            unique_blanks = list(np.random.choice(
+                unique_blanks, min(len(unique_blanks), max_count), 
+                replace=False))
+        except:
+            unique_blanks = unique_blanks[:max_count]
     return unique_blanks
 

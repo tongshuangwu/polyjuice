@@ -48,7 +48,7 @@ def batched_generate(generator, examples, temperature=1,
 
 def generate_on_prompts(generator, prompts, temperature=1, 
     num_beams=None, n=3, top_p=0.9, do_sample=True, batch_size=128):
-    preds_list = batched_generate(prompts, generator, 
+    preds_list = batched_generate(generator, prompts,
         temperature=temperature, n=n, 
         num_beams=num_beams, 
         do_sample=do_sample, batch_size=batch_size)
