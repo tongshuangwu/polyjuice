@@ -70,9 +70,9 @@ def flatten_fillins(doc, indxes, fillins_by_idxes, is_return_text=True):
     text_arr.append([doc[prev:].text])
     otexts = ["".join(s) for s in itertools.product(*text_arr)]
     if is_return_text:
-        return otexts[0] if otexts else ""
+        return otexts[0].strip() if otexts else ""
     else:
-        return otexts
+        return otexts.strip()
 
 
 class _WhitespaceSpacyTokenizer:

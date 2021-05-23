@@ -6,11 +6,10 @@ def create_blanked_sents(doc, indexes=None):
     if indexes:
         if type(indexes[0]) == int: 
             indexes = [indexes]
-        indexes_list = [indexes]
+        indexes_list = indexes #[indexes]
     else:
         indexes_list = get_random_idxes(
             doc, is_token_only=False, max_count=3)
-        
     blanks = set([flatten_fillins(
         doc, indexes, [BLANK_TOK] * len(indexes)) \
         for indexes in indexes_list])
@@ -87,7 +86,8 @@ def get_random_idxes(doc,
     if max_count is not None:
         try:
             unique_blanks = list(np.random.choice(
-                unique_blanks, min(len(unique_blanks), max_count), 
+                np.array(unique_blanks, dtype="object"), 
+                min(len(unique_blanks), max_count), 
                 replace=False))
         except:
             unique_blanks = unique_blanks[:max_count]
