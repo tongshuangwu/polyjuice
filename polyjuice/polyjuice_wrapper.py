@@ -99,6 +99,42 @@ class Polyjuice(object):
         if not self.validate_and_load_model("perplex_scorer"): return None
         return compute_sent_perplexity([sentence], self.perplex_scorer, is_cuda=self.is_cuda)[0]
     
+    ##############################################
+    # apis
+    ##############################################
+
+    def detect_ctrl_code(self, 
+        orig: Tuple[str, Doc], 
+        perturb: Tuple[str, Doc],
+        eops: List=None) -> str:
+        """Detect the perturbation type.
+
+        Args:
+            orig (Tuple[str, Doc]): The perturb-from sentence,
+                either in str or SpaCy doc.
+            perturb (Tuple[str, Doc]): The perturb-to sentence,
+                either in str or SpaCy doc.
+            eops (List, Optional): The editing operations, output of
+                `compute_edit_ops` in 
+                `polyjuice.compute_perturbs.compute_edit_ops`.
+                If None, will be computed.
+        Returns:
+            str: The extracted code. If cannot be identified, return None.
+        """
+        orig = self._process(orig) if type(orig) == str else orig
+        perturb = self._process(perturb) if type(perturb) == str else perturb
+        if orig.text == perturb.text:
+            return "equal"
+        if eops is None:
+            eops = compute_edit_ops(orig, perturb)
+        meta = SentenceMetadata(eops)
+        meta.compute_metadata(
+            sentence_similarity=self._compute_sent_cosine_distance)
+        if meta.primary and meta.primary.tag in ALL_CTRL_CODES:
+            return meta.primary.tag
+        else:
+            return None
+
     def get_random_blanked_sentences(self, 
         sentence: Tuple[str, Doc], 
         pre_selected_idxes: List[int]=None,
@@ -109,7 +145,8 @@ class Polyjuice(object):
         """Generate some random blanks for a given sentence
 
         Args:
-            sentence (Tuple[str, Doc]): [description]
+            sentence (Tuple[str, Doc]): The sentence to be blanked,
+                either in str or SpaCy doc.
             pre_selected_idxes (List[int], optional): 
                 If set, only allow blanking a preset range of token indexes. 
                 Defaults to None.
@@ -223,10 +260,8 @@ class Polyjuice(object):
                 pp = self._compute_delta_perplexity(eop)
                 is_vaild = pp.pr_sent < perplex_thred and pp.pr_phrase < perplex_thred
             if is_vaild and is_filter_code:
-                meta = SentenceMetadata(eop)
-                meta.compute_metadata(
-                    sentence_similarity=self._compute_sent_cosine_distance)
-                is_vaild = is_vaild and meta.primary and meta.primary.tag in ctrl_codes
+                ctrl = self.detect_ctrl_code(orig_doc, generated_doc, eop)
+                is_vaild = is_vaild and ctrl is not None and ctrl in ctrl_codes
             if is_vaild:
                 validated_set.append(generated)
                 #validated_changes.append(Munch(

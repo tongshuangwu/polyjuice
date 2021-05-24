@@ -85,6 +85,15 @@ perturbations = pj.perturb(
 # 'It is great even for kids.']
 ```
 
+To detect ctrl code from a given sentence pair,
+```py
+pj.detect_ctrl_code(
+    "it's great for kids.", 
+    "It is great for kids but not for any adults.")
+# return: negation
+```
+
+
 To get randomly placed blanks,
 ```py
 perturbations = pj.perturb(
