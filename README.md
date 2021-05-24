@@ -29,6 +29,15 @@ cd polyjuice
 pip install -e .
 ```
 
+Polyjuice depends on [SpaCy](https://spacy.io/) and [Huggingface Transformers](https://huggingface.co/). To use most functions, please also install the following:
+
+```bash
+# install pytorch, as here: https://pytorch.org/get-started/locally/#start-locally
+pip install torch
+# The SpaCy language package
+python -m spacy download en_core_web_sm
+```
+
 ## Perturbation
 
 ```py

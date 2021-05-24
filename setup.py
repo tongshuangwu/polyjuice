@@ -3,59 +3,22 @@ import os
 from datetime import date
 from setuptools import setup, find_packages
 # --- import your package ---
-import polyjuice as package
 
 directory = os.path.dirname(os.path.abspath(__file__))
+
+VERSION = '0.1.0'
+SHORT_DESCRIPTION = "NLP error analysis."
+LICENSE = "BSD 3-Clause License"
+AUTHOR = "Tongshuang Wu"
+AUTHOR_EMAIL = "wtshuang@cs.washington.edu"
+MAINTAINER = "Tongshuang Wu"
+MAINTAINER_EMAIL = "wtshuang@cs.washington.edu"
+GITHUB_USERNAME = "tongshuangwu"
+PKG_NAME = "polyjuice"
 
 if __name__ == "__main__":
     # --- Automatically generate setup parameters ---
     # Your package name
-    PKG_NAME = package.__name__
-    # Your GitHub user name
-    try:
-        GITHUB_USERNAME = package.__github_username__
-    except:
-        GITHUB_USERNAME = "Unknown-Github-Username"
-
-    # Short description will be the description on PyPI
-    try:
-        SHORT_DESCRIPTION = package.__short_description__  # GitHub Short Description
-    except:
-        print(
-            "'__short_description__' not found in '%s.__init__.py'!" % PKG_NAME)
-        SHORT_DESCRIPTION = "No short description!"
-
-    # Long description will be the body of content on PyPI page
-    try:
-        path = os.path.join(directory, 'README.md')
-        with open(path) as read_file:
-            LONG_DESCRIPTION = read_file.read()
-    except:
-        LONG_DESCRIPTION = "No long description!"
-
-    # Version number, VERY IMPORTANT!
-    VERSION = package.__version__
-
-    # Author and Maintainer
-    try:
-        AUTHOR = package.__author__
-    except:
-        AUTHOR = "Unknown"
-
-    try:
-        AUTHOR_EMAIL = package.__author_email__
-    except:
-        AUTHOR_EMAIL = None
-
-    try:
-        MAINTAINER = package.__maintainer__
-    except:
-        MAINTAINER = "Unknown"
-
-    try:
-        MAINTAINER_EMAIL = package.__maintainer_email__
-    except:
-        MAINTAINER_EMAIL = None
 
     PACKAGES, INCLUDE_PACKAGE_DATA, PACKAGE_DATA, PY_MODULES = (
         None, None, None, None,
@@ -84,12 +47,6 @@ if __name__ == "__main__":
     URL = "https://github.com/{0}/{1}".format(GITHUB_USERNAME, repository_name)
     # Use todays date as GitHub release tag
     github_release_tag = str(date.today())
-
-    try:
-        LICENSE = package.__license__
-    except:
-        print("'__license__' not found in '%s.__init__.py'!" % PKG_NAME)
-        LICENSE = ""
 
     PLATFORMS = [
         "Windows",
@@ -130,8 +87,6 @@ if __name__ == "__main__":
     setup(
         name=PKG_NAME,
         description=SHORT_DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
-        long_description_content_type="text/markdown",
         version=VERSION,
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
