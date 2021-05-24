@@ -1,19 +1,23 @@
+from polyjuice.filters_and_selectors.selections import select_diverse_perturbations, select_surprise_explanations
 import torch
-from spacy.tokens import Doc
-from typing import Tuple, List
 import numpy as np
+from spacy.tokens import Doc
+from typing import List, Dict, Tuple
 from .filters_and_selectors import \
     load_perplex_scorer, \
     compute_sent_cosine_distance, \
     compute_delta_perplexity, \
-    compute_sent_perplexity
+    compute_sent_perplexity, \
+    select_diverse_perturbations, \
+    select_surprise_explanations, PredFormat
+from .filters_and_selectors.selections import select_diverse_perturbations
 from .generations import \
     get_prompts, \
     load_generator, \
     get_random_idxes, \
     create_blanked_sents, \
     generate_on_prompts, \
-    RANDOM_TAGS, ALL_TAGS
+    RANDOM_CTRL_CODES, ALL_CTRL_CODES
 from .compute_perturbs import compute_edit_ops, SentenceMetadata
 from .helpers import create_processor
 
@@ -70,7 +74,7 @@ class Polyjuice(object):
         self.generator = load_generator(
             self.polyjuice_generator_path, self.is_cuda)
         return True
-    def _load_spacy_processor(self, is_space_tokenizer: bool=True):
+    def _load_spacy_processor(self, is_space_tokenizer: bool=False):
         logger.info("Setup SpaCy processor.")
         self.spacy_processor = create_processor(is_space_tokenizer)
         return True
@@ -80,7 +84,7 @@ class Polyjuice(object):
     ##############################################
     def _process(self, sentence: str):
         if not self.validate_and_load_model("spacy_processor"): return None
-        return self.spacy_processor(sentence)
+        return self.spacy_processor(str(sentence))
 
     def _compute_sent_cosine_distance(self, s1: str, s2: str):
         if not self.validate_and_load_model("distance_scorer"): return 1
@@ -139,7 +143,9 @@ class Polyjuice(object):
         is_complete_blank: bool=False, 
         ctrl_code: Tuple[str, List[str]]=None, 
         perplex_thred: int=10,
-        num_perturbations: int=3, 
+        num_perturbations: int=3,
+        verbose: bool=False, 
+        #is_include_metadata: bool=True,
         **kwargs) -> List[str]:
         """The primary perturbation function. Running example:
         Original sentence: 
@@ -168,6 +174,9 @@ class Polyjuice(object):
                 Defaults to 5. If None, will skip filter.
             num_perturbations: 
                 Num of max perturbations to collect. Defaults to 3.
+            is_include_metadata: 
+                Whether to return text, or also include other metadata and perplex score.
+                Default to True.
             **kwargs: 
                 The function can also take arguments for huggingface generators, 
                 like top_p, num_beams, etc.
@@ -183,23 +192,29 @@ class Polyjuice(object):
             blanked_sents = self.get_random_blanked_sentences(orig_doc.text)
         if ctrl_code:
             ctrl_codes = [ctrl_code] if type(ctrl_code) == str else ctrl_code
-            if not set(ctrl_codes).issubset(ALL_TAGS):
-                logger.error(f"{set(ctrl_codes)-ALL_TAGS} is not a valid ctrl code. Please choose from {ALL_TAGS}.")
+            if not set(ctrl_codes).issubset(ALL_CTRL_CODES):
+                logger.error(f"{set(ctrl_codes)-ALL_CTRL_CODES} is not a valid ctrl code. Please choose from {ALL_CTRL_CODES}.")
             is_filter_code = True
         else:
-            ctrl_codes = RANDOM_TAGS
+            ctrl_codes = RANDOM_CTRL_CODES
             is_filter_code = False
         prompts = get_prompts(
             doc=orig_doc,
             ctrl_codes=ctrl_codes, 
             blanked_sents=blanked_sents, 
             is_complete_blank=is_complete_blank)
+        if verbose:
+            logger.info("Generating on these prompts:")
+            for p in prompts: logger.info(f" | {p}")
         generated = generate_on_prompts(
             generator=self.generator, prompts=prompts, **kwargs)
         merged = list(np.concatenate(generated))
 
-        validated_changes = []
-        for input_ctrl, generated in merged:
+        validated_set = []
+        for _, generated in merged:
+            # skip 
+            if generated in validated_set or generated.lower() == orig_doc.text.lower(): 
+                continue
             is_vaild = True
             generated_doc = self._process(generated)
             eop = compute_edit_ops(orig_doc, generated_doc)
@@ -210,9 +225,80 @@ class Polyjuice(object):
                 meta = SentenceMetadata(eop)
                 meta.compute_metadata(
                     sentence_similarity=self._compute_sent_cosine_distance)
-                is_vaild = is_vaild and meta.primary and meta.primary.tag == input_ctrl
-            if is_vaild and generated != orig_doc and not generated in validated_changes:
-                validated_changes.append(generated)
-        return list(np.random.choice(
-            validated_changes, 
-            min(num_perturbations, len(validated_changes)), replace=False))
+                is_vaild = is_vaild and meta.primary and meta.primary.tag in ctrl_codes
+            if is_vaild:
+                validated_set.append(generated)
+                #validated_changes.append(Munch(
+                #    text=generated, doc=generated_doc, meta=meta, perplex=pp))
+        if num_perturbations is None:
+            num_perturbations = 1000
+        sampled = np.random.choice(validated_set,
+            min(num_perturbations, len(validated_set)), replace=False)
+        return [str(s) for s in sampled]
+
+
+    def select_diverse_perturbations(self, 
+        orig_and_perturb_pairs: List[Tuple[str, str]],
+        nsamples: int)-> List[Tuple[str, str]]:
+        """Having each perturbation be represented by its token changes, 
+        control code, and dependency tree strcuture, we greedily select the 
+        ones that are least similar to those already selected. This tries 
+        to avoid redundancy in common perturbations such as black -> white.
+
+        Args: 
+            orig_and_perturb_pairs (List[Tuple[str, str]]):
+                A list of (orig, perturb) text pair. Not necessarily the 
+                all the same orig text.
+            nsamples (int): Number of samples to select
+
+        Returns:
+            List[Tuple[str, str]]: A subsample of (orig, perturb) pairs.
+        """
+
+        return select_diverse_perturbations(
+            orig_and_perturb_pairs=orig_and_perturb_pairs,
+            nsamples=nsamples,
+            compute_sent_cosine_distance=self._compute_sent_cosine_distance,
+            process=self._process)
+        
+    def select_surprise_explanations(self,
+        orig_text: str,
+        perturb_texts: List[str],
+        orig_pred: PredFormat, 
+        perturb_preds: List[PredFormat], 
+        feature_importance_dict: Dict[str, float],
+        agg_feature_importance_thred: float=0.1) -> List[Dict]:
+        """Select surprising perturbations based on a feature importance map. 
+        we estimate the expected change in prediction with feature attributions, 
+        and select counterfactuals that violate these expectations, i.e., examples 
+        where the real change in prediction is large even though importance scores 
+        are low, and examples where the change is small but importance scores are high.
+
+        Args:
+            orig_doc (Doc): The original text.
+            perturb_docs (List[Doc]): The perturbed texts.
+            orig_pred (PredFormat): Prediction of the original text, in the format of 
+                [{label: str, score: float}]
+            perturb_preds (List[PredFormat]): Prediction of the perturbed texts,
+                Each entry in the format of [{label: str, score: float}]
+            feature_importance_dict (Dict[str, float]): The precomputed feature map.
+            agg_feature_importance_thred (float, Optional): A threshold for classifying
+                surprises.
+        Returns:
+            List[Dict]: Return the selected surprises in the format of:
+            {
+                case, [str]: Suprise filp | Suprise unflip, 
+                pred, [str]: the prediction for the perturbation,
+                changed_features, List[str]: the changed features
+                perturb_doc: the perturbed doc))
+            }
+        """
+        return select_surprise_explanations(
+            orig_text=orig_text,
+            perturb_texts=perturb_texts,
+            orig_pred=orig_pred,
+            perturb_preds=perturb_preds,
+            feature_importance_dict=feature_importance_dict,
+            processor=self._process,
+            agg_feature_importance_thred=agg_feature_importance_thred
+        )
