@@ -101,20 +101,18 @@ pj.detect_ctrl_code(
 
 To get randomly placed blanks,
 ```py
-perturbations = pj.perturb(
-    orig_sent=text,
-    # can specify where to put the blank. Otherwise, it's automatically selected.
-    # Can be a list or a single sentence.
-    blanked_sent=["It is [BLANK] for kids.", "It is great for [BLANK]."],
-    # can also specify the ctrl code (a list or a single code.)
-    # The code should be from 'resemantic', 'restructure', 'negation', 'insert', 'lexical', 'shuffle', 'quantifier', 'delete'.
-    ctrl_code="negation",
-    # Customzie perplexity score. 
-    perplex_thred=20,
-    # number of perturbations to return
-    num_perturbations=3,
-    # the function also takes in additional arguments for huggingface generators.
-    num_beams=3
+random_blanks = py.get_random_blanked_sentences(
+    sentence=text,
+    # only allow selecting from a preset range of token indexes
+    pre_selected_idxes=None,
+    # only select from a subset of dep tags
+    deps=None,
+    # blank sub-spans or just single tokens
+    is_token_only=False,
+    # maximum number of returned index tuple
+    max_blank_sent_count=3,
+    # maximum number of blanks per returned sentence
+    max_blank_block=1
 )
 ```
 
