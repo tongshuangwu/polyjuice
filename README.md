@@ -17,17 +17,13 @@ Bibtex for citations:
 ```
 
 ## Installation
-From pypi:  
-```bash
-pip install polyjuice
-```
 
-From source:
 ```bash
 git clone git@github.com:tongshuangwu/polyjuice.git
 cd polyjuice
 pip install -e .
 ```
+We have not published the package to Pypi due to some dependency complex.
 
 Polyjuice depends on [SpaCy](https://spacy.io/) and [Huggingface Transformers](https://huggingface.co/). To use most functions, please also install the following:
 
