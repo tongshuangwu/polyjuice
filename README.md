@@ -56,6 +56,10 @@ text = "It is great for kids."
 # When running it for the first time, the wrapper will automatically
 # load related models, e.g. the generator and the perplexity filter.
 perturbations = pj.perturb(text)
+
+# return: ['It is bad for kids too.',
+# "It 's great for kids.",
+# 'It is great even for kids.']
 ```
 
 ### More advanced APIs
@@ -80,9 +84,10 @@ perturbations = pj.perturb(
     num_beams=3
 )
 
-# return: ['It is bad for kids too.',
-# "It 's great for kids.",
-# 'It is great even for kids.']
+# return: [
+# 'It is not great for kids.', 
+# 'It is great for kids but not for anyone.',
+# 'It is great for kids but not for any adults.']
 ```
 
 To detect ctrl code from a given sentence pair,
@@ -111,10 +116,6 @@ perturbations = pj.perturb(
     # the function also takes in additional arguments for huggingface generators.
     num_beams=3
 )
-# return: [
-# 'It is not great for kids.', 
-# 'It is great for kids but not for anyone.',
-# 'It is great for kids but not for any adults.']
 ```
 
 
