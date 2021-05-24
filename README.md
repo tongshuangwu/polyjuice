@@ -18,6 +18,12 @@ Bibtex for citations:
 
 ## Installation
 
+From Pypi:
+```bash
+pip install polyjuice
+```
+
+From source:
 ```bash
 git clone git@github.com:tongshuangwu/polyjuice.git
 cd polyjuice

@@ -1,4 +1,3 @@
-from polyjuice.filters_and_selectors.selections import select_diverse_perturbations, select_surprise_explanations
 import torch
 import numpy as np
 from spacy.tokens import Doc
@@ -10,7 +9,6 @@ from .filters_and_selectors import \
     compute_sent_perplexity, \
     select_diverse_perturbations, \
     select_surprise_explanations, PredFormat
-from .filters_and_selectors.selections import select_diverse_perturbations
 from .generations import \
     get_prompts, \
     load_generator, \
@@ -19,7 +17,10 @@ from .generations import \
     generate_on_prompts, \
     RANDOM_CTRL_CODES, ALL_CTRL_CODES
 from .compute_perturbs import compute_edit_ops, SentenceMetadata
+from .compute_perturbs.compute_edit_ops import compute_edit_ops
+
 from .helpers import create_processor
+
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -67,12 +68,12 @@ class Polyjuice(object):
 
     def _load_perplex_scorer(self):
         logger.info("Setup perplexity scorer.")
-        self.perplex_scorer = load_perplex_scorer(self.is_cuda)
+        self.perplex_scorer = load_perplex_scorer(is_cuda=self.is_cuda)
         return True
     def _load_generator(self):
         logger.info("Setup Polyjuice.")
         self.generator = load_generator(
-            self.polyjuice_generator_path, self.is_cuda)
+            self.polyjuice_generator_path, is_cuda=self.is_cuda)
         return True
     def _load_spacy_processor(self, is_space_tokenizer: bool=False):
         logger.info("Setup SpaCy processor.")
@@ -88,15 +89,15 @@ class Polyjuice(object):
 
     def _compute_sent_cosine_distance(self, s1: str, s2: str):
         if not self.validate_and_load_model("distance_scorer"): return 1
-        return compute_sent_cosine_distance(s1, s2, self.distance_scorer)
+        return compute_sent_cosine_distance(s1, s2, self.distance_scorer, is_cuda=self.is_cuda)
 
     def _compute_delta_perplexity(self, eops):
         if not self.validate_and_load_model("perplex_scorer"): return None
-        return compute_delta_perplexity(eops, self.perplex_scorer)
+        return compute_delta_perplexity(eops, self.perplex_scorer, is_cuda=self.is_cuda)
 
     def _compute_sent_perplexity(self, sentence: str):
         if not self.validate_and_load_model("perplex_scorer"): return None
-        return compute_sent_perplexity([sentence], self.perplex_scorer)[0]
+        return compute_sent_perplexity([sentence], self.perplex_scorer, is_cuda=self.is_cuda)[0]
     
     def get_random_blanked_sentences(self, 
         sentence: Tuple[str, Doc], 
