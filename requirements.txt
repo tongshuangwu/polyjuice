@@ -1,7 +1,6 @@
 munch>=2.5.0
 spacy>=3.0.6
 scipy>=1.6.3
-lm-scorer @ git+https://github.com/tongshuangwu/lm-scorer
 sentence-transformers>=1.1.0
 transformers>=4.5.1
 pattern>=3.6.0

@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 SHORT_DESCRIPTION = "NLP error analysis."
 LICENSE = "BSD 3-Clause License"
 AUTHOR = "Tongshuang Wu"
@@ -14,7 +14,7 @@ AUTHOR_EMAIL = "wtshuang@cs.washington.edu"
 MAINTAINER = "Tongshuang Wu"
 MAINTAINER_EMAIL = "wtshuang@cs.washington.edu"
 GITHUB_USERNAME = "tongshuangwu"
-PKG_NAME = "polyjuice"
+PKG_NAME = "polyjuice_nlp"
 
 if __name__ == "__main__":
     # --- Automatically generate setup parameters ---
@@ -69,7 +69,13 @@ if __name__ == "__main__":
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ]
-
+    # Long description will be the body of content on PyPI page
+    try:
+        path = os.path.join(directory, 'README.md')
+        with open(path) as read_file:
+            LONG_DESCRIPTION = read_file.read()
+    except:
+        LONG_DESCRIPTION = "No long description!"
     # Read requirements.txt, ignore comments
     try:
         REQUIRES = list()
@@ -87,6 +93,8 @@ if __name__ == "__main__":
     setup(
         name=PKG_NAME,
         description=SHORT_DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/markdown",
         version=VERSION,
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
