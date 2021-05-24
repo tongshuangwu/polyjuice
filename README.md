@@ -60,7 +60,7 @@ perturbations = pj.perturb(text)
 
 ### More advanced APIs
 
-Please see the documents in X for more explanations.
+Please see the documents in the [main Python file](https://github.com/tongshuangwu/polyjuice/blob/main/polyjuice/polyjuice_wrapper.py) for more explanations.
 
 To perturb with more controls,
 ```py
@@ -111,4 +111,4 @@ perturbations = pj.perturb(
 
 ## Selection
 
-For selecting diverse and surprising perturbations (for augmentation and explanation experiments in our paper), please see the notebook demo.
+For selecting diverse and surprising perturbations (for augmentation and explanation experiments in our paper), please [see the notebook demo](https://github.com/tongshuangwu/polyjuice/blob/main/notebooks/Polyjuice%20demo.ipynb).
