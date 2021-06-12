@@ -1,6 +1,6 @@
 # Polyjuice
 
-This repository contains code for testing NLP Models as described in the following paper:  
+This repository contains code for generating counterfactual sentences as described in the following paper:  
 >[Polyjuice: Generating Counterfactuals for Explaining, Evaluating, and Improving Models](https://homes.cs.washington.edu/~wtshuang/static/papers/2021-acl-polyjuice.pdf)  
 > Tongshuang Wu, Marco Tulio Ribeiro, Jeffrey Heer, Daniel S. Weld
 > Association for Computational Linguistics (ACL), 2021
