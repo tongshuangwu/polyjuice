@@ -13,11 +13,11 @@ from copy import deepcopy
 def _add_special_tokens(text, tokenizer):
     return tokenizer.bos_token + text + tokenizer.eos_token
 
-def _tokens_log_prob(texts, model, tokenizer, batch_size=128):
+def _tokens_log_prob(texts, model, tokenizer, batch_size=128, is_cuda=True):
         outputs = []
         for i in range(0, len(texts), batch_size):
             batch = texts[i : i + batch_size]
-            outputs.extend(_tokens_log_prob_for_batch(batch, model, tokenizer))
+            outputs.extend(_tokens_log_prob_for_batch(batch, model, tokenizer, is_cuda=is_cuda))
         return outputs
     
 def _tokens_log_prob_for_batch(texts, model, tokenizer, is_cuda=True):
@@ -96,7 +96,7 @@ def compute_sent_perplexity(
     """
     scores = []
     model, tokenizer = perplex_scorer.model, perplex_scorer.tokenizer
-    outputs = _tokens_log_prob(sentences, model, tokenizer, is_cuda)
+    outputs = _tokens_log_prob(sentences, model, tokenizer, is_cuda=is_cuda)
     for sent_log_prob, sent_ids, sent_tokens in outputs:
         score = reduce_perplex_prob(sent_log_prob, reduce=reduce, log=log)
         if is_normalize:
@@ -118,7 +118,7 @@ def compute_phrase_perplexity(
     if len(sentence_phrase_tuples) == 0:
         return scores
     model, tokenizer = perplex_scorer.model, perplex_scorer.tokenizer
-    outputs = _tokens_log_prob([s[0] for s in sentence_phrase_tuples], model, tokenizer, is_cuda)
+    outputs = _tokens_log_prob([s[0] for s in sentence_phrase_tuples], model, tokenizer, is_cuda=is_cuda)
     for idx, (sentence, phrase) in enumerate(sentence_phrase_tuples):
         log_probs_all = outputs[idx][0]
         full_len = len(outputs[idx][1]) - 1
