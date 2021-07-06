@@ -24,7 +24,8 @@ def _tokens_log_prob_for_batch(texts, model, tokenizer, is_cuda=True):
     device = "cuda" if is_cuda else "cpu"
     outputs = []
     texts = [_add_special_tokens(text, tokenizer) for text in deepcopy(texts)]
-    encoding = tokenizer.batch_encode_plus(texts, return_tensors='pt')
+    #encoding = tokenizer.batch_encode_plus(texts, return_tensors='pt')
+    encoding = tokenizer.batch_encode_plus(texts, return_tensors='pt', truncation=True, padding=True)
     with torch.no_grad():
         ids = encoding["input_ids"].to(device)
         attention_mask = encoding["attention_mask"].to(device)

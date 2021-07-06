@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 SHORT_DESCRIPTION = "NLP error analysis."
 LICENSE = "BSD 3-Clause License"
 AUTHOR = "Tongshuang Wu"
