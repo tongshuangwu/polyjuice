@@ -1,8 +1,8 @@
 munch>=2.5.0
-spacy>=3.0.6
 scipy
 sentence-transformers>=1.1.0
 transformers>=4.5.1
 pattern>=3.6.0
 nltk
 zss
+spacy>=3.0.6

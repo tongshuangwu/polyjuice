@@ -6,15 +6,16 @@ from setuptools import setup, find_packages
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
-VERSION = '0.1.3'
-SHORT_DESCRIPTION = "NLP error analysis."
+VERSION = '0.1.5'
+SHORT_DESCRIPTION = "A tool for text counterfactual generation."
 LICENSE = "BSD 3-Clause License"
 AUTHOR = "Tongshuang Wu"
 AUTHOR_EMAIL = "wtshuang@cs.washington.edu"
 MAINTAINER = "Tongshuang Wu"
 MAINTAINER_EMAIL = "wtshuang@cs.washington.edu"
 GITHUB_USERNAME = "tongshuangwu"
-PKG_NAME = "polyjuice_nlp"
+PKG_NAME = "polyjuice"
+PKG_NAME_expose = "polyjuice_nlp"
 
 if __name__ == "__main__":
     # --- Automatically generate setup parameters ---
@@ -89,9 +90,8 @@ if __name__ == "__main__":
     except:
         print("'requirements.txt' not found!")
         REQUIRES = list()
-
     setup(
-        name=PKG_NAME,
+        name=PKG_NAME_expose,
         description=SHORT_DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         long_description_content_type="text/markdown",
