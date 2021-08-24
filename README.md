@@ -7,12 +7,20 @@ This repository contains code for generating counterfactual sentences as describ
 
 Bibtex for citations:
 ```bibtex
-@inproceedings{polyjuice:acl21,
-    title = "{P}olyjuice: Generating Counterfactuals for Explaining, Evaluating, and Improving Models",
-    author = "Tongshuang Wu and Marco Tulio Ribeiro and Jeffrey Heer and Daniel S. Weld",
-    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics",
+@inproceedings{wu-etal-2021-polyjuice,
+    title = "Polyjuice: Generating Counterfactuals for Explaining, Evaluating, and Improving Models",
+    author = "Wu, Tongshuang  and
+      Ribeiro, Marco Tulio  and
+      Heer, Jeffrey  and
+      Weld, Daniel",
+    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+    month = aug,
     year = "2021",
-    publisher = "Association for Computational Linguistics"
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.acl-long.523",
+    doi = "10.18653/v1/2021.acl-long.523",
+    pages = "6707--6723",
 }
 ```
 
