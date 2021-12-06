@@ -44,7 +44,7 @@ def batched_generate(generator,
             preds_list += generator(
                 examples[e:e+batch_size],
                 temperature=temperature,
-                return_tensors=True,
+#                 return_tensors=True,
                 num_beams=num_beams,
                 max_length=1000,
                 early_stopping=None if num_beams is None else True,
