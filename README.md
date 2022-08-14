@@ -1,7 +1,7 @@
 # Polyjuice
 
 This repository contains code for generating counterfactual sentences as described in the following paper:  
->[Polyjuice: Generating Counterfactuals for Explaining, Evaluating, and Improving Models](https://homes.cs.washington.edu/~wtshuang/static/papers/2021-acl-polyjuice.pdf)  
+>[Polyjuice: Generating Counterfactuals for Explaining, Evaluating, and Improving Models](https://www.cs.cmu.edu/~sherryw/assets/pubs/2021-polyjuice.pdf)  
 > Tongshuang Wu, Marco Tulio Ribeiro, Jeffrey Heer, Daniel S. Weld
 > Association for Computational Linguistics (ACL), 2021
 
